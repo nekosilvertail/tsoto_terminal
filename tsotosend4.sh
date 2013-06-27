@@ -93,6 +93,7 @@ SEND_LOGIN(){
 	
 	SEND_AUTH_MSG_NAME
 	
+	echo "Bitte gib dein tsoto-Passwort ein:"	
 	stty -echo
 	read user_password
 	stty echo
@@ -179,8 +180,14 @@ SEND_WELCOME_TEXT(){
 }
 
 SEND_AUTH_MSG_NAME(){
-	echo "Bitte gib deinen tsoto-Benutzernamen ein:"
-	read user_name
+	if [[ -z $user_name ]]
+	then
+		echo "Bitte gib deinen tsoto-Benutzernamen ein:"
+		read user_name
+		return 0
+	else
+		return 1
+	fi
 }
 
 SEND_HELP_MSG(){
