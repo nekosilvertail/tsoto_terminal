@@ -177,18 +177,18 @@ CHECK_FOR_LOGIN(){
 
 #startup#
 echo "Starte.."
-STTY_SETUP
 echo "Terminal wird umkonfiguriert.."
-TRAP
+STTY_SETUP
 echo "Falle wird aufgestellt.."
-MAKE_TEMP
+TRAP
 echo "Temporäre Dateien werden erstellt.."
-CHANGE_IFS
+MAKE_TEMP
 echo "Internes wird umgestellt.."
-CALL_API
+CHANGE_IFS
 echo "Chat wird abgefragt.."
-PARSECHAT
+CALL_API
 echo "Chat wird verarbeitet.."
+PARSECHAT
 DISPLAY_CHAT
 
 ##################################
