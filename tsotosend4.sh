@@ -11,6 +11,7 @@ MAKE_TEMP(){
 	ck_out2=$(mktemp)
 	ck_out3=$(mktemp)
 	ck_out4=$(mktemp)
+	send_return=$(mktemp)
 }
 
 CLOSE(){
@@ -20,6 +21,7 @@ CLOSE(){
 	rm $ck_out2
 	rm $ck_out3
 	rm $ck_out4
+	rm $send_return
 	exit 0
 }
 
@@ -28,7 +30,7 @@ TRAP(){
 }
 
 SEND_PURE(){
-	curl --data-urlencode "message=$msg" http://www.tsoto.net/Chat/API
+	curl -ss --data-urlencode "message=$msg" --output $send_return http://www.tsoto.net/Chat/API
 }
 
 CHANGE_IFS(){
@@ -169,6 +171,12 @@ SEND_DEBUG(){
 	echo "ck_out2 = $ck_out2"
 	echo "ck_out3 = $ck_out3"
 	echo "ck_out4 = $ck_out4"
+	echo "send_return = $send_return"	
+}
+
+SHOW_RETURN(){
+	cat $send_return
+	echo ""
 }
 
 SEND_WELCOME_TEXT(){
@@ -191,15 +199,19 @@ SEND_AUTH_MSG_NAME(){
 }
 
 SEND_HELP_MSG(){
+	#todo: colouring of the help file.
 	echo "Es stehen folgenden Befehle zur Auswahl:"
 	echo -e "/login\nLoggt dich im tsoto ein\n\
 /logout\nLoggt dich aus dem tsoto aus\n\
 /online\nZeigt eine Liste der im Chat eingeloggten Benutzer\n\
 /w Benutzername\nSendet eine Flüsternachricht an \"Benutzername\"\n\
 /r\nAntwortet dem Benutzer, an den zuletzt geflüstert wurde\n\
+/me\nSchreibt eine Nachricht in der 3. Person\n\
+/keks Benutzername\nReicht \"Benutzername\" einen Keks\n\
 /debug\nZeigt Debug-Informationen an\n\
 /cookie\nDebug-Befehl, holt das Cookie\n\
 /cookie_del\nDebug-Befehl, löscht das lokal gespeicherte Cookie\n\
+/error\nStartet die Fehlerbehandlung. Zeigt aktuell nur den Output des Curl-Aufrufs an\n\
 /help\nZeigt diese Auflistung an\n
 	"
 }
@@ -217,6 +229,7 @@ do
 	read -p "> " msg
 	msg_intro=$(echo $msg | cut -d " " -f 1)
 	case "$msg_intro" in
+		"/error" )		SHOW_RETURN ;;
 		"/help" )		SEND_HELP_MSG ;;
 		"/cookie_del" )		DESTROY_COOKIE ;;
 		"/cookie" )		GENERATE_COOKIE ;;
