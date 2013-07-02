@@ -53,7 +53,6 @@ MAKE_TEMP(){
 	NC="\e[0m"
 	NBC="\e[49m"
 	bold=$(echo -e "\033[1m")
-	unbold=$(echo -e "\033[0m")
 	normal=$(tput sgr0)
 	whisper_senden="\e[41m"
 	whisper_empfangen="\e[42m"
