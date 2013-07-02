@@ -1,5 +1,5 @@
 #!/bin/bash
-#terminal tsoto send client v0.2
+#terminal tsoto send client v0.4
 #nekosilvertail 2013
 #cc-by-sa
 #uses the tsoto-api version (UNKNOWN)

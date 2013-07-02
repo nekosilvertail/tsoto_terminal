@@ -52,7 +52,8 @@ MAKE_TEMP(){
 	temp_msg=$(mktemp)
 	NC="\e[0m"
 	NBC="\e[49m"
-	bold=$(tput bold)
+	bold=$(echo -e "\033[1m")
+	unbold=$(echo -e "\033[0m")
 	normal=$(tput sgr0)
 	whisper_senden="\e[41m"
 	whisper_empfangen="\e[42m"
@@ -77,6 +78,17 @@ TRAP(){
 #tsoto api call, output into temporary file
 CALL_API(){
 	curl -ss http://www.tsoto.net/Chat/API > $temp 
+}
+
+PARSE_BBCODE(){
+	#nachricht=$(echo $nachricht | sed s/[[]b[]]/$bold/g | sed s/[[]\\/b[]]/$unbold/g )
+	#just removing every bbcode for now, couldnt find a way to make a text coloured AND bold the same time.
+	#not done yet: if you set a text to bold, you have to set it to "normal" back again, therefor loosing the colour. so the code that closes the bbcode should have the colour added after the the terminal got set to normal again
+	
+	#nachricht=$(echo $nachricht | sed s/[[].*[]]//g)
+	#have to put that back because it removes things like [b]test[/b] completely (because it sees: [ b test /b ]). 
+	#maybe using an iteration, removing only the first [.*] until there are no more left to remove. that should do the job
+	echo ""
 }
 
 #chat parser function
@@ -131,6 +143,9 @@ PARSECHAT(){
 		* )
 			chatfarbe="\e[1;37m" ;;
 		esac
+
+		PARSE_BBCODE
+
 		case $typ in
 		NORMAL )
 			echo -e "$zeit <$name>""${chatfarbe} $nachricht""${NC}" >> $chat_lokal;;
