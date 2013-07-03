@@ -156,7 +156,7 @@ SEND_WHISPER(){
 SEND_REWHISPER(){
 	if (test $whisper_target) 
 	then
-		msg_whisper=$(echo $msg | cut -d " " -f 2-)
+		msg_whisper=$(echo $msg | strings -e S | cut -d " " -f 2-)
 		msg=$(echo /w $whisper_target $msg_whisper)
 		SEND_PURE
 	else
