@@ -206,6 +206,7 @@ SEND_HELP_MSG(){
 /online\nZeigt eine Liste der im Chat eingeloggten Benutzer\n\
 /w Benutzername\nSendet eine Flüsternachricht an \"Benutzername\"\n\
 /r\nAntwortet dem Benutzer, an den zuletzt geflüstert wurde\n\
+/afk Grund\nStellt den Status auf Abwesend, mit "Grund" als Grund. Eine 2. Eingabe stellt den Status zurück. Alternativ kann /re verwendet werden\n\
 /me\nSchreibt eine Nachricht in der 3. Person\n\
 /keks Benutzername\nReicht \"Benutzername\" einen Keks\n\
 /debug\nZeigt Debug-Informationen an\n\
