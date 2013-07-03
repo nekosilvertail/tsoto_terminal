@@ -143,7 +143,7 @@ PARSECHAT(){
 			chatfarbe="\e[1;37m" ;;
 		esac
 
-		PARSE_BBCODE
+		#PARSE_BBCODE
 
 		case $typ in
 		NORMAL )

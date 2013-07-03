@@ -15,7 +15,7 @@ MAKE_TEMP(){
 }
 
 CLOSE(){
-	echo -e "\nSIGINT CAUGHT. CLOSING."
+	echo -e "\nProgramm wird beendet.."
 	rm $cookie
 	rm $ck_out1
 	rm $ck_out2
@@ -76,6 +76,7 @@ DESTROY_COOKIE(){
 }
 
 SEND_LOGOUT(){
+	#logout is defunc. Cookie problems. Investigation is running.
 	if [[ -s $cookie ]]
 	then
 		curl -ss -b $cookie --output $ck_out4 --data "logout=logout&user_id=276" www.tsoto.net
@@ -225,11 +226,16 @@ clear
 #default text
 SEND_WELCOME_TEXT
 
+###########################
+#######main routine########
+###########################
+
 while true
 do
 	read -p "> " msg
 	msg_intro=$(echo $msg | cut -d " " -f 1)
 	case "$msg_intro" in
+		"/close" )		CLOSE;;
 		"/error" )		SHOW_RETURN ;;
 		"/help" )		SEND_HELP_MSG ;;
 		"/cookie_del" )		DESTROY_COOKIE ;;
