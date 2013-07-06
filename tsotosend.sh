@@ -118,7 +118,7 @@ GENERATE_COOKIE(){
 	else
 		#echo "Cookie wird generiert."
 		curl -ss -c $cookie --output $ck_out1 www.tsoto.net
-		echo "$(date) Cookie wurde generiert" >> $log
+		echo "$(date +"%Y.%m.%d %H:%M:%S") Cookie wurde generiert" >> $log
 		return 0
 	fi
 }
@@ -171,7 +171,7 @@ SEND_LOGIN(){
 	if CHECK_FOR_LOGIN
 	then
 		echo "Erfolgreich eingeloggt.."
-		echo "$(date) Login erfolgreich durchgeführt" >> $log
+		echo "$(date +"%Y.%m.%d %H:%M:%S") Login erfolgreich durchgeführt" >> $log
 	else
 		echo "Fehler, Login fehlgeschlagen."
 		echo "Weitere Informationen: /debug, Inhalte von ck_out2 und ck_out3 überprüfen"
@@ -290,7 +290,7 @@ clear
 SEND_WELCOME_TEXT
 VAR_CONFIG
 STARTUP_SETTINGS
-echo "$(date) Client gestartet" >> $log
+echo "$(date +"%Y.%m.%d %H:%M:%S") Client gestartet" >> $log
 GENERATE_COOKIE
 
 ###########################
@@ -316,5 +316,5 @@ do
 		* ) 			SEND_PURE ;;	
 	esac	
 	
-	echo "$(date) Nachricht gesendet: $msg" >> $log
+	echo "$(date +"%Y.%m.%d %H:%M:%S") Nachricht gesendet: $msg" >> $log
 done
