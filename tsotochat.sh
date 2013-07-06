@@ -58,6 +58,16 @@ MAKE_TEMP(){
 	whisper_empfangen="\e[42m"
 }
 
+VAR_CONFIG(){
+	#defines where the system can find what
+	config_dir="data"
+	logfile_name=$(cat "$config_dir/chat.cfg" | grep logfilename | cut -d "=" -f2)
+	user_name=$(cat "$config_dir/chat.cfg" | grep user_name | cut -d "=" -f2)
+	#don't change things if you don't know what you are doing.
+	config_dir_user="./$config_dir/$user_name"
+	log="./$config_dir/$logfile_name"
+}
+
 #function called on closing via ctrl+c, sets the terminal settings back, changes the IFS back to normal, otherwise the terminal would be totally messed up
 CLOSE(){
 	echo -e "\nSIGINT CAUGHT. CLOSING."
@@ -197,6 +207,7 @@ echo "Falle wird aufgestellt.."
 TRAP
 echo "Temporäre Dateien werden erstellt.."
 MAKE_TEMP
+VAR_CONFIG
 echo "Internes wird umgestellt.."
 CHANGE_IFS
 echo "Chat wird abgefragt.."

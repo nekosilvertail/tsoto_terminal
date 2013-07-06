@@ -13,26 +13,30 @@ MAKE_TEMP(){
 	send_return=$(mktemp)
 }
 
-VAR_CONFIG(){
-	#defines where the system can find what
-	logfile_name="logfile_$(date +%m_%Y).log"
+PRECONFIG(){
 	config_dir="data"
-	#don't change things if you dont know what you are doing.
-	config_dir_user="./$config_dir/$user_name"
-	cookie="./$config_dir_user/cookie"
-	log="./$config_dir/$logfile_name"
-	
 }
 
-STARTUP_SETTINGS(){
-	if CHECK_SETTINGS
+VAR_CONFIG(){
+	#defines where the system can find what
+	logfile_name=$(cat "$config_dir/chat.cfg" | grep logfilename | cut -d "=" -f2)
+	#don't change things if you don't know what you are doing.
+	config_dir_user="$config_dir/$user_name"
+	cookie="./$config_dir_user/cookie"
+	log="./$config_dir/$logfile_name"
+}
+
+STARTUP_SETTINGS_DIR(){
+	if CHECK_SETTINGS_DIR
 	then
-		MAKE_SETTINGS
+		MAKE_SETTINGS_DIR
 		return 0
 	else
 		return 1
 	fi
+}
 
+STARTUP_SETTINGS(){
 	if CHECK_USER_CONFIG
 	then
 		MAKE_USER_CONFIG
@@ -42,8 +46,29 @@ STARTUP_SETTINGS(){
 	fi
 }
 
-CHECK_SETTINGS(){
+STARTUP_SETTINGS_FILE(){
+	if CHECK_SETTINGS_FILE
+	then
+		MAKE_SETTINGS_FILE
+		return 0
+	else
+		return 1	
+	fi
+}
+
+CHECK_SETTINGS_DIR(){
 	if [[ -d "$config_dir" ]]
+	then
+		echo "$(date +"%Y.%m.%d %H:%M:%S") Konfigurationsverzeichnis besteht bereits" >> $log
+		return 1
+	else
+		echo "$(date +"%Y.%m.%d %H:%M:%S") Konfigurationsverzeichnis nicht vorhanden" >> $log
+		return 0
+	fi
+}
+
+CHECK_SETTINGS_FILE(){
+	if [[ -f "$config_dir/chat.cfg" ]]
 	then
 		return 1
 	else
@@ -51,23 +76,49 @@ CHECK_SETTINGS(){
 	fi
 }
 
-MAKE_SETTINGS(){
+SETTINGS_HELPER(){
+
+	#check user name
+	user_name_settings=$(cat "$config_dir/chat.cfg" | grep username | cut -d "=" -f2)
+	if [[ "$user_name" == "$user_name_settings" ]]
+	then
+		return 1
+	else
+		echo "$(date +"%Y.%m.%d %H:%M:%S") Ersetze den vorhandenen Benutzernamen $user_name_settings in der Konfigurationsdatei durch $user_name" >> $log
+		cat "$config_dir/chat.cfg" | sed s/username=.*/username=$user_name/g > $config_dir/tmp.cfg
+		#for some reason, when just piping the output back to $config_dir/chat.cfg, then the file is empty. nice, isnt it?^^	
+		mv $config_dir/tmp.cfg $config_dir/chat.cfg
+		return 
+	fi
+}
+
+MAKE_SETTINGS_FILE(){
+	sleep 1
+	echo "Erstelle die Konfigurationsdatei chat.cfg in $config_dir"
+	touch $config_dir/chat.cfg
+	echo "logfilename=logfile_$(date +%m_%Y).log" > $config_dir/chat.cfg
+	echo "username=$user_name" >> $config_dir/chat.cfg
+}
+
+MAKE_SETTINGS_DIR(){
 	mkdir $config_dir
-	echo "Erstelle lokales Konfigurationsverzeichnis \"$config_dir\" im derzeitigen Ordner: $(pwd)" >> $log
+	echo "$(date +"%Y.%m.%d %H:%M:%S") Erstelle lokales Konfigurationsverzeichnis \"$config_dir\" im derzeitigen Ordner: $(pwd)" >> $log
 }
 
 CHECK_USER_CONFIG(){
 	if [[ -d "$config_dir_user" ]]
 	then
+		echo "$(date +"%Y.%m.%d %H:%M:%S") Benutzerverzeichnis $config_dir_user besteht bereits" >> $log
 		return 1
 	else
+		echo "$(date +"%Y.%m.%d %H:%M:%S") Benutzerverzeichnis $config_dir_user nicht vorhanden" >> $log
 		return 0
 	fi
 }
 
 MAKE_USER_CONFIG(){
-	echo "Erstelle lokales Benutzerkonfigurationsverzeichnis \"$config_dir/$user_name\" im derzeitigen Ordner: $(pwd)"
-	mkdir $config_dir/$user_name
+	echo "$(date +"%Y.%m.%d %H:%M:%S") Erstelle lokales Benutzerkonfigurationsverzeichnis \"$config_dir/$user_name\" im derzeitigen Ordner: $(pwd)" >> $log
+	mkdir "./$config_dir_user"
 }
 
 CLOSE(){
@@ -78,7 +129,7 @@ CLOSE(){
 	rm $ck_out3
 	rm $ck_out4
 	rm $send_return
-	echo "$(date) Client beendet" >> $log
+	echo "$(date +"%Y.%m.%d %H:%M:%S") Client beendet" >> $log
 	exit 0
 }
 
@@ -175,6 +226,7 @@ SEND_LOGIN(){
 	else
 		echo "Fehler, Login fehlgeschlagen."
 		echo "Weitere Informationen: /debug, Inhalte von ck_out2 und ck_out3 überprüfen"
+		echo "$(date +"%Y.%m.%d %H:%M:%S") Login fehlgeschlagen" >> $log
 	fi
 }
 
@@ -282,17 +334,20 @@ SEND_HELP_MSG(){
 }
 ############start 
 echo "Starte.."
+PRECONFIG
+STARTUP_SETTINGS_DIR
 echo "Erstelle temporäre Werte.."
 MAKE_TEMP
 echo "Falle wird aufgestellt.."
 TRAP
 clear
 SEND_WELCOME_TEXT
+STARTUP_SETTINGS_FILE
 VAR_CONFIG
 STARTUP_SETTINGS
 echo "$(date +"%Y.%m.%d %H:%M:%S") Client gestartet" >> $log
 GENERATE_COOKIE
-
+SETTINGS_HELPER
 ###########################
 #######main routine########
 ###########################
