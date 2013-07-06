@@ -5,8 +5,6 @@
 #uses the tsoto-api version (UNKNOWN)
 #needs external resources: w3m for decoding html chars, md5sum for checking for new messages, curl for receiving
 
-clear
-
 #setup the tty for not taking input and not being synced to the output
 STTY_SETUP(){
 	STTY_ORIG=$(stty -g)
@@ -58,9 +56,18 @@ MAKE_TEMP(){
 	whisper_empfangen="\e[42m"
 }
 
+REPORT_TEMPS(){
+	echo "temp=$temp" > ./$config_dir/recv.vars
+	echo "chat_lokal=$chat_lokal" >> ./$config_dir/recv.vars
+	echo "temp_msg=$temp_msg" >> ./$config_dir/recv.vars
+}
+
+PRECONFIG(){
+	config_dir="data"
+}
+
 VAR_CONFIG(){
 	#defines where the system can find what
-	config_dir="data"
 	logfile_name=$(cat "$config_dir/chat.cfg" | grep logfilename | cut -d "=" -f2)
 	user_name=$(cat "$config_dir/chat.cfg" | grep user_name | cut -d "=" -f2)
 	#don't change things if you don't know what you are doing.
@@ -74,6 +81,7 @@ CLOSE(){
 	rm $temp
 	rm $chat_lokal
 	rm $temp_msg
+	rm $config_dir/recv.run
 	IFS=$IFS_ORIG
 	stty $STTY
 	exit 0
@@ -195,11 +203,25 @@ CHECK_FOR_LOGIN(){
 	fi
 }
 
+CHECK_FOR_SEND(){
+	if [[ ! -a $config_dir/send.run || -a $config_dir/recv.run ]]
+	then
+		echo "Send client läuft nicht, oder Recv client rennt bereits."
+		exit 1
+	else	
+		touch $config_dir/recv.run
+		return 0
+	fi
+}
+
 ##################################
 ##########START ROUTINE###########
 ##################################
 
 #startup#
+PRECONFIG
+CHECK_FOR_SEND
+VAR_CONFIG
 echo "Starte.."
 echo "Terminal wird umkonfiguriert.."
 STTY_SETUP
@@ -207,7 +229,7 @@ echo "Falle wird aufgestellt.."
 TRAP
 echo "Temporäre Dateien werden erstellt.."
 MAKE_TEMP
-VAR_CONFIG
+REPORT_TEMPS
 echo "Internes wird umgestellt.."
 CHANGE_IFS
 echo "Chat wird abgefragt.."

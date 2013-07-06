@@ -78,7 +78,7 @@ CHECK_SETTINGS_FILE(){
 
 SETTINGS_HELPER(){
 
-	#check user name
+#check user name
 	user_name_settings=$(cat "$config_dir/chat.cfg" | grep username | cut -d "=" -f2)
 	if [[ "$user_name" == "$user_name_settings" ]]
 	then
@@ -129,6 +129,7 @@ CLOSE(){
 	rm $ck_out3
 	rm $ck_out4
 	rm $send_return
+	rm $config_dir/send.run
 	echo "$(date +"%Y.%m.%d %H:%M:%S") Client beendet" >> $log
 	exit 0
 }
@@ -164,7 +165,7 @@ CHECK_FOR_LOGIN(){
 GENERATE_COOKIE(){
 	if [[ -s $cookie ]]
 	then
-		#echo "Cookie existiert bereits."
+		echo "$(date +"%Y.%m.%d %H:%M:%S") Cookie existiert bereits." >> $log
 		return 1
 	else
 		#echo "Cookie wird generiert."
@@ -291,6 +292,10 @@ SEND_DEBUG(){
 }
 
 SHOW_RETURN(){
+	if [[ -z "$send_return" ]]
+	then
+		curl -ss www.tsoto.net/Chat/API --output $send_return
+	fi
 	cat $send_return
 	echo ""
 }
@@ -308,6 +313,7 @@ SEND_AUTH_MSG_NAME(){
 	then
 		echo "Bitte gib deinen tsoto-Benutzernamen ein:"
 		read user_name
+		clear
 		return 0
 	else
 		return 1
@@ -332,9 +338,23 @@ SEND_HELP_MSG(){
 /help\nZeigt diese Auflistung an\n
 	"
 }
-############start 
-echo "Starte.."
+
+CHECK_FOR_SEND(){
+	if [[ -a $config_dir/send.run ]]
+	then
+		echo "Send client scheint bereits zu laufen. Wenn du dir sicher bist, daß dies nicht der Fall ist, dann lösche die Datei: $config_dir/send.run"
+		exit 1
+	else
+		touch $config_dir/send.run
+		return 0
+	fi
+}
+#############################
+########START ROUTINE########
+#############################
 PRECONFIG
+CHECK_FOR_SEND
+echo "Starte.."
 STARTUP_SETTINGS_DIR
 echo "Erstelle temporäre Werte.."
 MAKE_TEMP
