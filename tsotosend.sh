@@ -236,7 +236,7 @@ SEND_ONLINE(){
 	online_users=$(curl -ss www.tsoto.net/Chat/API/Mitglieder)
 	for i in $online_users
 	do
-		username=$(echo $i | cut -d "|" -f 1 | strings)
+		username=$(echo $i | cut -d "|" -f 1 | strings --bytes 1)
 		userstate=$(echo $i | cut -d "|" -f 2 | strings)
 		reason=$(echo $i | cut -d "|" -f 3 | strings | w3m -dump -T text/html)
 		#well that case is pretty much just for only one thing: not echoing that ^M after the line end of the last user
