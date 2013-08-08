@@ -343,7 +343,7 @@ SEND_HELP_MSG(){
 	echo "Es stehen folgenden Befehle zur Auswahl:"
 	echo -e "/login\nLoggt dich im tsoto ein\n\
 /logout\nLoggt dich aus dem tsoto aus\n\
-/block Benutzername\nBlockiert Nachrichten von \"Benutzername\"\n\
+/block Benutzername\nBlockiert Nachrichten von \"Benutzername\"\(Funktioniert noch nicht\)\n\
 /online\nZeigt eine Liste der im Chat eingeloggten Benutzer\n\
 /w Benutzername\nSendet eine Flüsternachricht an \"Benutzername\"\n\
 /r\nAntwortet dem Benutzer, an den zuletzt geflüstert wurde\n\
