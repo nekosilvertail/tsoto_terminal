@@ -24,6 +24,7 @@ VAR_CONFIG(){
 	config_dir_user="$config_dir/$user_name"
 	cookie="./$config_dir_user/cookie"
 	log="./$config_dir/$logfile_name"
+	block="./$config_dir_user/blocklist"
 }
 
 STARTUP_SETTINGS_DIR(){
@@ -139,7 +140,10 @@ TRAP(){
 }
 
 SEND_PURE(){
+	#post
 	curl -ss --data-urlencode "message=$msg" --output $send_return http://www.tsoto.net/Chat/API
+	#get
+	#curl -ss --data-urlencode --output $send_return http://www.tsoto.net/Chat/Message/1?message=$msg
 }
 
 CHANGE_IFS(){
@@ -320,11 +324,26 @@ SEND_AUTH_MSG_NAME(){
 	fi
 }
 
+SEND_BLOCK(){
+	if (test $1) 
+	then
+		if (CHECK_BLOCK_NAME $1)
+		then
+			echo "Der User ist bereits geblockt!"
+		else
+			echo $1 >> $block
+		fi
+	else
+		echo "Du hast vergessen einen Benutzer zum blocken anzugeben!"
+	fi
+}
+
 SEND_HELP_MSG(){
 	#todo: colouring of the help file.
 	echo "Es stehen folgenden Befehle zur Auswahl:"
 	echo -e "/login\nLoggt dich im tsoto ein\n\
 /logout\nLoggt dich aus dem tsoto aus\n\
+/block Benutzername\nBlockiert Nachrichten von \"Benutzername\"\n\
 /online\nZeigt eine Liste der im Chat eingeloggten Benutzer\n\
 /w Benutzername\nSendet eine Flüsternachricht an \"Benutzername\"\n\
 /r\nAntwortet dem Benutzer, an den zuletzt geflüstert wurde\n\
@@ -337,6 +356,18 @@ SEND_HELP_MSG(){
 /error\nStartet die Fehlerbehandlung. Zeigt aktuell nur den Output des Curl-Aufrufs an\n\
 /help\nZeigt diese Auflistung an\n
 	"
+}
+
+CHECK_BLOCK_NAME(){
+	namecheck=$(cat $block | grep -x $1 | strings --bytes 1)
+	#debug line
+	#echo "namecheck = \"$namecheck\""
+	if (test $namecheck)
+	then
+		return 0
+	else
+		return 1
+	fi
 }
 
 CHECK_FOR_SEND(){
@@ -376,8 +407,10 @@ while true
 do
 	read -p "> " msg
 	msg_intro=$(echo $msg | cut -d " " -f 1)
+	msg_var1=$(echo $msg | awk -F " " '{print $2}')
 	case "$msg_intro" in
 		"/close" )		CLOSE;;
+		"/block" ) 		SEND_BLOCK $msg_var1 ;;
 		"/error" )		SHOW_RETURN ;;
 		"/help" )		SEND_HELP_MSG ;;
 		"/cookie_del" )		DESTROY_COOKIE ;;
