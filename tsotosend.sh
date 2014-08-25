@@ -141,7 +141,7 @@ TRAP(){
 
 SEND_PURE(){
 	#post
-	curl -ss --data-urlencode "message=$msg" --output $send_return http://www.tsoto.net/Chat/API
+	curl -ss -b $cookie -c $cookie --data-urlencode "message=$msg" --output $send_return http://www.tsoto.net/Chat/API
 	#get
 	#curl -ss --data-urlencode --output $send_return http://www.tsoto.net/Chat/Message/1?message=$msg
 }
@@ -156,12 +156,14 @@ RETURN_IFS(){
 }
 
 CHECK_FOR_LOGIN(){
-	check=$(curl -ss http://www.tsoto.net/Chat/API)
+	check=$(curl -ss -c $cookie -b $cookie http://www.tsoto.net/Chat/API)
 	is_error=$(echo $check | cut -d"=" -f1)
 	if [[ "$is_error" == "ERROR" ]] 
 	then
+		echo "$(date +"%Y.%m.%d %H:%M:%S") Login-Check fehlgeschlagen: $check." >> $log
 		return 1
 	else
+                echo "$(date +"%Y.%m.%d %H:%M:%S") Login-Check fehlgeschlagen: $check." >> $log
 		return 0
 	fi
 }
@@ -193,7 +195,7 @@ SEND_LOGOUT(){
 	#logout is defunc. Cookie problems. Investigation is running.
 	if [[ -s $cookie ]]
 	then
-		curl -ss -b $cookie --output $ck_out4 --data "logout=logout&user_id=276" www.tsoto.net
+		curl -ss -b $cookie --output $ck_out4 --data "logout=logout" www.tsoto.net
 	else
 		echo "Cookie existiert nicht."
 		GENERATE_COOKIE
