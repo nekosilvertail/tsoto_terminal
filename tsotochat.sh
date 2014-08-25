@@ -69,10 +69,11 @@ PRECONFIG(){
 VAR_CONFIG(){
 	#defines where the system can find what
 	logfile_name=$(cat "$config_dir/chat.cfg" | grep logfilename | cut -d "=" -f2)
-	user_name=$(cat "$config_dir/chat.cfg" | grep user_name | cut -d "=" -f2)
+	user_name=$(cat "$config_dir/chat.cfg" | grep username | cut -d "=" -f2)
 	#don't change things if you don't know what you are doing.
-	config_dir_user="./$config_dir/$user_name"
+	config_dir_user="$config_dir/$user_name"
 	log="./$config_dir/$logfile_name"
+	cookie="./$config_dir_user/cookie"
 }
 
 #function called on closing via ctrl+c, sets the terminal settings back, changes the IFS back to normal, otherwise the terminal would be totally messed up
@@ -94,7 +95,7 @@ TRAP(){
 
 #tsoto api call, output into temporary file
 CALL_API(){
-	curl -ss http://www.tsoto.net/Chat/API > $temp 
+	curl -ss -b $cookie -c $cookie http://www.tsoto.net/Chat/API > $temp 
 }
 
 PARSE_BBCODE(){
@@ -181,7 +182,7 @@ PARSECHAT(){
 
 #check if user is logged into the chat, also: error handling
 CHECK_FOR_LOGIN(){
-	check=$(curl -ss http://www.tsoto.net/Chat/API)
+	check=$(curl -ss -b $cookie -c $cookie http://www.tsoto.net/Chat/API)
 	is_error=$(echo $check | cut -d"=" -f1)
  	if [[ "$is_error" == "ERROR" ]]
 	then
