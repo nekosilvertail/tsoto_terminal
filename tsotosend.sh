@@ -268,7 +268,7 @@ SEND_ONLINE(){
 
 SEND_WHISPER(){
 	whisper_target=$(echo $msg | cut -d " " -f 2)
-	curl --data-urlencode "message=$msg" http://www.tsoto.net/Chat/API
+	curl -b $cookie -c $cookie --data-urlencode "message=$msg" http://www.tsoto.net/Chat/API
 }
 
 SEND_REWHISPER(){
