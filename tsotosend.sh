@@ -195,7 +195,7 @@ SEND_LOGOUT(){
 	#logout is defunc. Cookie problems. Investigation is running.
 	if [[ -s $cookie ]]
 	then
-		curl -ss -b $cookie --output $ck_out4 --data "logout=logout" www.tsoto.net
+		curl -ss -b $cookie -c $cookie --output $ck_out4 --data "logout=logout" www.tsoto.net
 	else
 		echo "Cookie existiert nicht."
 		GENERATE_COOKIE
@@ -239,7 +239,7 @@ SEND_LOGIN(){
 
 SEND_ONLINE(){
 	CHANGE_IFS
-	online_users=$(curl -ss www.tsoto.net/Chat/API/Mitglieder)
+	online_users=$(curl -ss -b $cookie -c $cookie www.tsoto.net/Chat/API/Mitglieder)
 	for i in $online_users
 	do
 		username=$(echo $i | cut -d "|" -f 1 | strings --bytes 1)
